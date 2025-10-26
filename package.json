@@ -28,9 +28,6 @@
     "directories": {
       "buildResources": "assets"
     },
-    "asar": true,
-    "win": {
-      "target": "dir"
-    }
+    "asar": true
   }
 }

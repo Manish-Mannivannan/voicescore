@@ -1,0 +1,78 @@
+name: Build VoiceScore
+
+on:
+  push:
+    tags:
+      - 'v*'        # build when you push a tag like v1.0.0
+  workflow_dispatch:  # allow manual trigger in Actions tab
+
+jobs:
+  release:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Install dependencies for root and renderer
+      - name: Install dependencies
+        run: |
+          npm install
+          cd renderer && npm install && cd ..
+
+      # Make sure whisper folder exists
+      - name: Ensure whisper dir exists
+        run: |
+          mkdir -p electron/whisper
+
+      # Download OS-specific Whisper binary + model at build time
+      # NOTE: you may need to adjust the exact asset names depending on your release zip names
+      - name: Download Whisper binary for this OS
+        run: |
+          echo "Runner OS: $RUNNER_OS"
+          cd electron/whisper
+
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            curl -L -o whisper.zip https://github.com/ggerganov/whisper.cpp/releases/latest/download/whisper-bin-x64.zip
+            tar -xf whisper.zip 2>/dev/null || unzip whisper.zip
+          elif [ "$RUNNER_OS" = "macOS" ]; then
+            # For Apple Silicon you'd want arm64; for Intel Mac you'd want x64.
+            # If you only care about Apple Silicon testers, keep arm64. Otherwise you can add a second matrix entry.
+            curl -L -o whisper.zip https://github.com/ggerganov/whisper.cpp/releases/latest/download/whisper-bin-macos-arm64.zip
+            tar -xf whisper.zip 2>/dev/null || unzip whisper.zip
+          else
+            curl -L -o whisper.zip https://github.com/ggerganov/whisper.cpp/releases/latest/download/whisper-bin-linux-x64.zip
+            tar -xf whisper.zip 2>/dev/null || unzip whisper.zip
+          fi
+
+          # Download base English model
+          curl -L -o ggml-base.en.bin https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin
+
+          echo "Contents of whisper/:"
+          ls -R
+
+      # Build the renderer (Vite) for production
+      - name: Build renderer
+        run: |
+          cd renderer
+          npm run build
+          cd ..
+
+      # Package the Electron app into installers for this OS
+      - name: Build Electron distributable
+        run: npm run electron-build
+
+      # Upload OS-specific artifacts so you can download them from the Action run
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: VoiceScore-${{ matrix.os }}
+          path: dist/**
