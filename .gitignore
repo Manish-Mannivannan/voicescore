@@ -1,0 +1,45 @@
+# Node modules
+node_modules/
+renderer/node_modules/
+
+# Build outputs
+dist/
+renderer/dist/
+out/
+out-build/
+*.log
+
+# Electron-builder output
+/*.exe
+/*.dmg
+/*.AppImage
+/build/
+release/
+*.asar
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Env / temp
+*.local
+*.env
+*.env.*
+*.pem
+*.pfx
+*.cer
+*.key
+*.crt
+*.swp
+*.swo
+
+# IDE/editor stuff
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# Whisper model binaries and downloaded runtime blobs (we will fetch these in CI instead)
+electron/whisper/**
+!electron/whisper/.keep

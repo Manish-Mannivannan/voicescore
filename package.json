@@ -1,0 +1,36 @@
+{
+  "name": "voicescore",
+  "version": "1.0.0",
+  "private": true,
+  "main": "electron/main.js",
+  "type": "commonjs",
+  "scripts": {
+    "electron-dev": "electron .",
+    "electron-build": "electron-builder",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "electron": "^30.0.9"
+  },
+  "devDependencies": {
+    "electron-builder": "^24.13.3",
+    "@types/node": "^22.7.4",
+    "typescript": "^5.5.4"
+  },
+  "build": {
+    "appId": "com.example.voicescore",
+    "productName": "VoiceScore",
+    "files": [
+      "electron/**/*",
+      "renderer/dist/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
+    "asar": true,
+    "win": {
+      "target": "dir"
+    }
+  }
+}

@@ -1,0 +1,176 @@
+/* === Global Reset & Base === */
+body {
+  font-family: "Inter", "Segoe UI", Roboto, sans-serif;
+  background: #f9fafb;
+  color: #1a1a1a;
+  margin: 0;
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+}
+
+h1, h2, h3 {
+  font-weight: 600;
+  color: #111827;
+}
+
+h1 {
+  font-size: 2.2rem;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+/* === Layout Card === */
+.card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  padding: 1.5rem 2rem;
+  width: 750px;
+  max-width: 90vw;
+  margin-bottom: 2rem;
+  transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* === Audio Section === */
+audio {
+  width: 100%;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+}
+
+/* === Buttons === */
+button {
+  border: none;
+  border-radius: 10px;
+  background: #e5e7eb;
+  color: #111827;
+  font-weight: 500;
+  padding: 0.6rem 1.2rem;
+  margin: 0.25rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+button:hover {
+  background: #d1d5db;
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+/* === Primary (Analyse) Button === */
+button.analyse-btn {
+  background: #34d399;
+  color: white;
+  display: block;
+  margin: 1.5rem auto;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+button.analyse-btn:hover {
+  background: #10b981;
+}
+
+/* === Numbers box === */
+.numbers-box {
+  background: #f3f4f6;
+  border-radius: 10px;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+/* === Analysis section === */
+.analysis-row {
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ✅ / ❌ badges */
+.analysis-row span {
+  display: inline-block;
+  font-size: 0.95rem;
+}
+
+.analysis-row strong {
+  min-width: 160px;
+}
+
+/* ✅ Green & ❌ Red coloring */
+.analysis-row span::before {
+  content: "";
+}
+
+.analysis-row span.good {
+  color: #059669;
+  font-weight: 600;
+}
+
+.analysis-row span.bad {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+/* === Transcript Section === */
+.transcript-box {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  margin-top: 1rem;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #111827;
+  white-space: pre-wrap;
+}
+
+/* === Headings === */
+h2, h3 {
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.3rem;
+}
+
+/* === Upload Button === */
+input[type="file"] {
+  display: none;
+}
+
+.upload-label {
+  display: inline-block;
+  background: #60a5fa;
+  color: white;
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-left: 0.5rem;
+  transition: background 0.2s;
+}
+
+.upload-label:hover {
+  background: #3b82f6;
+}
+
+/* === Center container === */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
