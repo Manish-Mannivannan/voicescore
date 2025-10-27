@@ -1,45 +1,26 @@
-# Node modules
+# Node
 node_modules/
-renderer/node_modules/
+npm-debug.log*
 
-# Build outputs
+# Vite/Electron build output
 dist/
 renderer/dist/
-out/
-out-build/
-*.log
+electron/dist/
 
-# Electron-builder output
-/*.exe
-/*.dmg
-/*.AppImage
-/build/
-release/
-*.asar
+# Local builds / portable app output
+PortableApp/
+VoiceScore-Portable/
 
-# OS junk
+# Whisper binaries and models (large files)
+**/whisper/*.bin
+**/whisper/*.exe
+**/whisper/*.dll
+**/whisper/*.dylib
+
+# OS files
 .DS_Store
 Thumbs.db
 
-# Env / temp
-*.local
-*.env
-*.env.*
-*.pem
-*.pfx
-*.cer
-*.key
-*.crt
-*.swp
-*.swo
-
-# IDE/editor stuff
-.vscode/*
-!.vscode/settings.json
-!.vscode/extensions.json
-!.vscode/tasks.json
-!.vscode/launch.json
-
-# Whisper model binaries and downloaded runtime blobs (we will fetch these in CI instead)
-electron/whisper/**
-!electron/whisper/.keep
+# Editor junk
+.vscode/
+.idea/
