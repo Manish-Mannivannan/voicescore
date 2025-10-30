@@ -11,10 +11,9 @@
     "build": "npm run build:renderer && npm run electron-build",
     "lint": "tsc --noEmit"
   },
-  "dependencies": {
-    "electron": "^30.0.9"
-  },
+  "dependencies": {},
   "devDependencies": {
+    "electron": "^30.0.9",
     "electron-builder": "^24.13.3",
     "@types/node": "^22.7.4",
     "typescript": "^5.5.4"
@@ -24,15 +23,24 @@
     "productName": "VoiceScore",
     "files": [
       "electron/**/*",
+      "!electron/whisper/**",
       "renderer/dist/**/*",
       "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "electron/whisper/",
+        "to": "whisper",
+        "filter": ["**/*"]
+      }
     ],
     "directories": {
       "buildResources": "assets"
     },
     "asar": true,
     "win": {
-      "target": "dir"
+      "target": "dir",
+      "signAndEditExecutable": false
     }
   }
 }

@@ -53,21 +53,12 @@ function isNumberWord(w: string): boolean {
     w in SMALL_NUMBERS ||
     w in TENS ||
     w in SCALES ||
-    w === "and" // we allow "and" inside phrases like "one hundred and five"
+    w === "and" // allow "and" inside phrases like "one hundred and five"
   );
 }
 
 // parse a run of number words (e.g. ["one","hundred","and","five"]) into a numeric value
 function parseNumberPhrase(words: string[]): number | null {
-  // We'll build this using a rolling "current chunk" and apply scales.
-  // Example: "two thousand three hundred twelve"
-  // - "two" -> current = 2
-  // - "thousand" -> total += current * 1000 ; current = 0
-  // - "three" -> current = 3
-  // - "hundred" -> current = current * 100  (so 3 * 100 = 300)
-  // - "twelve" -> current += 12
-  // end -> total + current
-
   let total = 0;
   let current = 0;
 
@@ -75,7 +66,6 @@ function parseNumberPhrase(words: string[]): number | null {
     const w = words[i];
 
     if (w === "and") {
-      // skip filler word like "one hundred and five"
       continue;
     }
 
@@ -93,17 +83,15 @@ function parseNumberPhrase(words: string[]): number | null {
       const scaleVal = SCALES[w];
 
       if (scaleVal === 100) {
-        // "X hundred" means multiply current by 100
+        // "X hundred"
         if (current === 0) {
-          // e.g. someone just said "hundred" with no leading number, treat as 100
           current = 100;
         } else {
           current = current * 100;
         }
       } else {
-        // thousand, million, etc:
+        // thousand, million, etc.
         if (current === 0) {
-          // "thousand" alone -> 1000
           total += scaleVal;
         } else {
           total += current * scaleVal;
@@ -113,7 +101,7 @@ function parseNumberPhrase(words: string[]): number | null {
       continue;
     }
 
-    // If we hit a word that isn't recognized, bail.
+    // hit a word that's not part of a number phrase
     return null;
   }
 
@@ -142,11 +130,9 @@ function extractSpokenNumbersFromWords(allWords: string[]): number[] {
     if (isNumberWord(w)) {
       buffer.push(w);
     } else {
-      // we hit a non-number word, so close out any buffered phrase
       flush();
     }
   }
-  // flush any leftovers
   flush();
 
   return results;
@@ -162,10 +148,38 @@ function isPrime(n: number): boolean {
   return true;
 }
 
+// NEW: remove timestamp blocks and bracketed timing metadata
+function stripTimestamps(raw: string): string {
+  let cleaned = raw;
+
+  // pattern like [00:00:00.000 --> 00:00:07.000]
+  cleaned = cleaned.replace(
+    /\[\s*\d{2}:\d{2}:\d{2}\.\d{3}\s*-->\s*\d{2}:\d{2}:\d{2}\.\d{3}\s*\]/g,
+    " "
+  );
+
+  // any leftover [ ... ] chunks that look like timing/noise
+  cleaned = cleaned.replace(/\[[^\]]*\]/g, " ");
+
+  return cleaned;
+}
+
+// NEW: real word splitter that drops empty + punctuation
+function getWordsForCount(text: string): string[] {
+  // keep only letters/numbers/' for contractions, turn rest into space
+  const normalized = text
+    .replace(/[^a-zA-Z0-9']/g, " ")
+    .trim();
+
+  if (!normalized) return [];
+  return normalized.split(/\s+/);
+}
+
+// extract actual numbers (digits and spoken) from cleaned text
 function extractNumbers(text: string): number[] {
   const nums: number[] = [];
 
-  // 1. Grab digits like "7", "2025", "42"
+  // 1. digit-based numbers, e.g. "7", "2025", "42"
   const digitMatches = text.match(/\b\d+\b/g);
   if (digitMatches) {
     digitMatches.forEach(token => {
@@ -173,10 +187,10 @@ function extractNumbers(text: string): number[] {
     });
   }
 
-  // 2. Grab spoken numbers like "twenty one", "one hundred and five"
+  // 2. spoken numbers e.g. "twenty one"
   const words = text
     .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, " ") // strip punctuation into spaces
+    .replace(/[^a-z0-9\s]/g, " ")
     .split(/\s+/)
     .filter(Boolean);
 
@@ -195,13 +209,17 @@ const AnalysisPanel: React.FC<Props> = ({ transcript }) => {
     numbersList,
     hasTwoPrimes
   } = useMemo(() => {
-    const wordsArr = transcript.trim().length
-      ? transcript.trim().split(/\s+/)
-      : [];
+    // 1. Clean the transcript so we don't treat timestamps as speech
+    const cleanedTranscript = stripTimestamps(transcript);
+
+    // 2. Word count from cleaned human text only
+    const wordsArr = getWordsForCount(cleanedTranscript);
     const wc = wordsArr.length;
 
-    const nums = extractNumbers(transcript);
+    // 3. Numbers from cleaned transcript
+    const nums = extractNumbers(cleanedTranscript);
 
+    // 4. Prime check
     const primeCount = nums.filter(n => isPrime(n)).length;
 
     return {

@@ -1,5 +1,15 @@
 import React, { useState, useRef } from "react";
 
+declare global {
+  interface Window {
+    voicescoreAPI: {
+      transcribeAudio: (
+        audio: ArrayBuffer
+      ) => Promise<{ transcript: string } | null>;
+    };
+  }
+}
+
 type Props = {
   onTranscriptReady: (t: string) => void;
 };
@@ -8,7 +18,6 @@ const AudioRecorder: React.FC<Props> = ({ onTranscriptReady }) => {
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
     null
   );
-  const [chunks, setChunks] = useState<BlobPart[]>([]);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -26,12 +35,10 @@ const AudioRecorder: React.FC<Props> = ({ onTranscriptReady }) => {
     mr.onstop = () => {
       const blob = new Blob(localChunks, { type: "audio/webm" });
       setAudioBlob(blob);
-      setChunks([]);
     };
 
     mr.start();
     setMediaRecorder(mr);
-    setChunks(localChunks);
   }
 
   function stopRecording() {
@@ -48,16 +55,14 @@ const AudioRecorder: React.FC<Props> = ({ onTranscriptReady }) => {
 
   async function handleAnalyse() {
     if (!audioBlob) {
-      console.warn("No audio to analyse");
+      alert("Please record or upload an audio file first.");
       return;
     }
+    // 1. Convert Blob to an ArrayBuffer. This is a browser-native operation.
+    const arrayBuffer = await audioBlob.arrayBuffer();
 
-    // @ts-ignore - voicescoreAPI is injected by preload.js
-    const result = await window.voicescoreAPI.transcribeAudio(
-      await audioBlob.arrayBuffer(),
-      audioBlob.type || "audio/webm"
-    );
-
+    // 2. Send the ArrayBuffer directly. The main process will convert it to a Node.js Buffer.
+    const result = await window.voicescoreAPI.transcribeAudio(arrayBuffer);
     const transcript = result?.transcript ?? "(no transcript returned)";
     onTranscriptReady(transcript);
   }
