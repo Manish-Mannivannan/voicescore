@@ -4,6 +4,16 @@ const fs = require('fs');
 const os = require('os');
 const { spawn } = require('child_process');
 
+function getWhisperExe() {
+  const exe = process.platform === "win32" ? "whisper-cli.exe" : "whisper-cli";
+  // In dev, your files live next to main.js; in prod, inside process.resourcesPath/whisper
+  const base = app.isPackaged
+    ? path.join(process.resourcesPath, "whisper")   // <-- from extraResources.to
+    : path.join(__dirname, "whisper");              // <-- electron/whisper during dev
+  return path.join(base, exe);
+}
+
+
 function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 900,

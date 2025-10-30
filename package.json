@@ -18,29 +18,25 @@
     "@types/node": "^22.7.4",
     "typescript": "^5.5.4"
   },
-  "build": {
-    "appId": "com.example.voicescore",
-    "productName": "VoiceScore",
-    "files": [
-      "electron/**/*",
-      "!electron/whisper/**",
-      "renderer/dist/**/*",
-      "package.json"
-    ],
-    "extraResources": [
-      {
-        "from": "electron/whisper/",
-        "to": "whisper",
-        "filter": ["**/*"]
-      }
-    ],
-    "directories": {
-      "buildResources": "assets"
-    },
-    "asar": true,
-    "win": {
-      "target": "dir",
-      "signAndEditExecutable": false
-    }
+"build": {
+  "appId": "com.example.voicescore",
+  "productName": "VoiceScore",
+  "files": [
+    "electron/**/*",
+    "!electron/whisper/**",
+    "renderer/dist/**/*",
+    "package.json"
+  ],
+  "extraResources": [
+    { "from": "electron/whisper/", "to": "whisper", "filter": ["**/*"] }
+  ],
+  "directories": { "buildResources": "assets" },
+  "asar": true,
+  "win": {
+    "target": ["nsis", "zip"],
+    "signAndEditExecutable": false,
+    "artifactName": "VoiceScore-${version}-${arch}.${ext}"
   }
+}
+
 }
